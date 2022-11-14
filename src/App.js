@@ -1,6 +1,12 @@
 import { useState } from "react";
+import Search from "./components/Search";
+import Header from "./components/Header";
+import List from "./components/List";
+import AddNew from "./components/AddNew";
 
 const App = () => {
+  // @STATE
+
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", phone: "040-123456", id: 1 },
     { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
@@ -16,9 +22,11 @@ const App = () => {
 
   const [serachedPerson, setSerachedPerson] = useState("");
 
+  // @EVENT HANDLERS
+
   // on the form submission we prevent the default behaviour of the event and then we create a new object with the name from the input
   // next we will add that name to the state Persons
-  const addName = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault(); // stops pages from refreshing amongst other things
     const nameObject = {
       name: newPerson.name,
@@ -36,62 +44,26 @@ const App = () => {
     }
   };
 
-  // I don't know how to solve generating new id's
-  const List = ({ array }) => {
-    if (serachedPerson) {
-      return array
-        .filter((person) =>
-          person.name.toLowerCase().includes(serachedPerson.toLowerCase())
-        )
-        .map((person) => (
-          <li key={person.name}>
-            <strong>Name:</strong> {person.name} <strong>Phone:</strong>{" "}
-            {person.phone}
-          </li>
-        ));
-    } else {
-      return array.map((person) => (
-        <li key={person.name}>
-          <strong>Name:</strong> {person.name} <strong>Phone:</strong>{" "}
-          {person.phone}
-        </li>
-      ));
-    }
-  };
-
   // I gave input names and now they are pulling to the event and are accesible via target.name which we can use to create dynamic name in the object
   // might be a good read on the subject https://www.pluralsight.com/guides/handling-multiple-inputs-with-single-onchange-handler-react
-  const handlehange = (event) => {
-    setNewPerson({ ...newPerson, [event.target.name]: event.target.value, });
-    console.log(newPerson);
-  };
+  const handleChange = (event) =>
+    setNewPerson({ ...newPerson, [event.target.name]: event.target.value });
+
   const handleSearchChange = (event) => setSerachedPerson(event.target.value);
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <div>
-        Serach:{" "}
-        <input value={serachedPerson.name} onChange={handleSearchChange} />
-      </div>
-      <h2>add a new:</h2>
-      <form onSubmit={addName}>
-        <div>
-          name:{" "}
-          <input name="name" value={newPerson.name} onChange={handlehange} />
-        </div>
-        <div>
-          phone:{" "}
-          <input name="phone" value={newPerson.phone} onChange={handlehange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      <ul>
-        <List array={persons} />
-      </ul>
+      <Header text="Phonebook" />
+      <Search person={serachedPerson} handleChange={handleSearchChange} />
+      <Header text="Add new:" />
+      <AddNew
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        person={newPerson}
+      />
+      <Header text="Entries:" />
+
+      <List array={persons} serached={serachedPerson} />
     </div>
   );
 };
