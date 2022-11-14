@@ -6,7 +6,7 @@ const App = () => {
     { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
     { name: "Dan Abramov", phone: "12-43-234345", id: 3 },
     { name: "Mary Poppendieck", phone: "39-23-6423122", id: 4 },
-    { name: "Movda Hellas", phone: "39-23-12341234", id: 5 }
+    { name: "Movda Hellas", phone: "39-23-12341234", id: 5 },
   ]);
 
   const [newPerson, setNewPerson] = useState({
@@ -24,30 +24,34 @@ const App = () => {
       name: newPerson.name,
       phone: newPerson.phone,
     };
-    if (persons.find((person) => person.name === serachedPerson.name)) {
+
+    if (persons.find((person) => person.name === nameObject.name)) {
       alert(`${newPerson.name} is already added to phonebook`);
     } else {
       setPersons(persons.concat(nameObject));
       setNewPerson({
-        name: "New name",
-        phone: "New phonenumber",
+        name: "",
+        phone: "",
       });
     }
   };
 
+  // I don't know how to solve generating new id's
   const List = ({ array }) => {
     if (serachedPerson) {
       return array
-        .filter((person) => person.name.toLowerCase().includes(serachedPerson.toLowerCase()))
+        .filter((person) =>
+          person.name.toLowerCase().includes(serachedPerson.toLowerCase())
+        )
         .map((person) => (
-          <li key={person.id}>
+          <li key={person.name}>
             <strong>Name:</strong> {person.name} <strong>Phone:</strong>{" "}
             {person.phone}
           </li>
         ));
     } else {
       return array.map((person) => (
-        <li key={person.id}>
+        <li key={person.name}>
           <strong>Name:</strong> {person.name} <strong>Phone:</strong>{" "}
           {person.phone}
         </li>
@@ -55,12 +59,11 @@ const App = () => {
     }
   };
 
-  // https://www.pluralsight.com/guides/handling-multiple-inputs-with-single-onchange-handler-react refactor changeHandler functions to 1
-  const handleNameChange = (event) => {
-    setNewPerson({ ...newPerson, name: event.target.value });
-  };
-  const handlePhoneChange = (event) => {
-    setNewPerson({ ...newPerson, phone: event.target.value });
+  // I gave input names and now they are pulling to the event and are accesible via target.name which we can use to create dynamic name in the object
+  // might be a good read on the subject https://www.pluralsight.com/guides/handling-multiple-inputs-with-single-onchange-handler-react
+  const handlehange = (event) => {
+    setNewPerson({ ...newPerson, [event.target.name]: event.target.value, });
+    console.log(newPerson);
   };
   const handleSearchChange = (event) => setSerachedPerson(event.target.value);
 
@@ -74,10 +77,12 @@ const App = () => {
       <h2>add a new:</h2>
       <form onSubmit={addName}>
         <div>
-          name: <input value={newPerson.name} onChange={handleNameChange} />
+          name:{" "}
+          <input name="name" value={newPerson.name} onChange={handlehange} />
         </div>
         <div>
-          phone: <input value={newPerson.phone} onChange={handlePhoneChange} />
+          phone:{" "}
+          <input name="phone" value={newPerson.phone} onChange={handlehange} />
         </div>
         <div>
           <button type="submit">add</button>
