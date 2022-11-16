@@ -1,19 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Search from "./components/Search";
 import Header from "./components/Header";
 import List from "./components/List";
 import AddNew from "./components/AddNew";
 
 const App = () => {
+  // @DATA FROM THE SERVER
+  useEffect(() => {
+    console.log("fetch data");
+    axios
+      .get("http://localhost:3001/persons")
+      .then((res) => {
+        setPersons(res.data);
+        console.log('data fetched');
+      })
+      .catch((e) => console.log(e));
+  }, []);
+
   // @STATE
 
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", phone: "040-123456", id: 1 },
-    { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", phone: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", phone: "39-23-6423122", id: 4 },
-    { name: "Movda Hellas", phone: "39-23-12341234", id: 5 },
-  ]);
+  // { name: "Arto Hellas", phone: "040-123456", id: 1 },
+  // { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
+  // { name: "Dan Abramov", phone: "12-43-234345", id: 3 },
+  // { name: "Mary Poppendieck", phone: "39-23-6423122", id: 4 },
+  // { name: "Movda Hellas", phone: "39-23-12341234", id: 5 },
+
+  const [persons, setPersons] = useState([]);
 
   const [newPerson, setNewPerson] = useState({
     name: "",
