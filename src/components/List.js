@@ -1,7 +1,7 @@
 import React from "react";
 import Person from "./Person";
 
-function List({ array, serached }) {
+function List({ array, serached, deletePerson }) {
   if (serached) {
     return (
       <ul>
@@ -10,7 +10,7 @@ function List({ array, serached }) {
             person.name.toLowerCase().includes(serached.toLowerCase())
           )
           .map((person) => (
-            <Person key={person.name} name={person.name} phone={person.phone} />
+            <Person key={person.id} id={person.id} name={person.name} phone={person.phone} deletePerson={deletePerson} />
           ))}
       </ul>
     );
@@ -18,7 +18,7 @@ function List({ array, serached }) {
     return (
       <ul>
         {array.map((person) => (
-          <Person key={person.name} name={person.name} phone={person.phone} />
+          <Person key={person.id} id={person.id} name={person.name} phone={person.phone} deletePerson={deletePerson}/>
         ))}
       </ul>
     );

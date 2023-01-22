@@ -1,38 +1,30 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Search from "./components/Search";
 import Header from "./components/Header";
 import List from "./components/List";
 import AddNew from "./components/AddNew";
+import personService from "./services/persons";
 
 const App = () => {
+
   // @DATA FROM THE SERVER
+
   useEffect(() => {
-    console.log("fetch data");
-    axios
-      .get("http://localhost:3001/persons")
-      .then((res) => {
-        setPersons(res.data);
-        console.log('data fetched');
+    personService
+      .getAll()
+      .then(data => {
+        setPersons(data)
       })
-      .catch((e) => console.log(e));
   }, []);
+
 
   // @STATE
 
-  // { name: "Arto Hellas", phone: "040-123456", id: 1 },
-  // { name: "Ada Lovelace", phone: "39-44-5323523", id: 2 },
-  // { name: "Dan Abramov", phone: "12-43-234345", id: 3 },
-  // { name: "Mary Poppendieck", phone: "39-23-6423122", id: 4 },
-  // { name: "Movda Hellas", phone: "39-23-12341234", id: 5 },
-
   const [persons, setPersons] = useState([]);
-
   const [newPerson, setNewPerson] = useState({
     name: "",
     phone: "",
   });
-
   const [serachedPerson, setSerachedPerson] = useState("");
 
   // @EVENT HANDLERS
@@ -41,15 +33,25 @@ const App = () => {
   // next we will add that name to the state Persons
   const handleSubmit = (event) => {
     event.preventDefault(); // stops pages from refreshing amongst other things
-    const nameObject = {
+    const personObject = {
       name: newPerson.name,
       phone: newPerson.phone,
     };
+   const existingUser = persons.find((person) => person.name === personObject.name)
 
-    if (persons.find((person) => person.name === nameObject.name)) {
-      alert(`${newPerson.name} is already added to phonebook`);
+    if (existingUser) {
+      if(window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedUser =  { ...existingUser, phone: personObject.phone}
+        personService
+          .updateOne(existingUser.id, updatedUser)
+          .then(returnedPerson => setPersons(returnedPerson))
+      }
     } else {
-      setPersons(persons.concat(nameObject));
+      personService
+        .addOne(personObject)
+        .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
+      // setPersons(persons.concat(personObject));
+      // why is this not considered mutating?
       setNewPerson({
         name: "",
         phone: "",
@@ -57,26 +59,38 @@ const App = () => {
     }
   };
 
+  const deletePerson = (id) => {
+  const user =  persons.find(person => person.id === id)
+  if(window.confirm(`Delete ${user.name}?`)) {
+    personService
+    .deleteOne(id)
+    .then(data => {
+      setPersons(data)
+    })
+  }
+  }
   // I gave input names and now they are pulling to the event and are accesible via target.name which we can use to create dynamic name in the object
   // might be a good read on the subject https://www.pluralsight.com/guides/handling-multiple-inputs-with-single-onchange-handler-react
   const handleChange = (event) =>
+    // spread operator syntax ensures that the object is replaced rather than mutated
     setNewPerson({ ...newPerson, [event.target.name]: event.target.value });
-
   const handleSearchChange = (event) => setSerachedPerson(event.target.value);
 
   return (
     <div>
       <Header text="Phonebook" />
       <Search person={serachedPerson} handleChange={handleSearchChange} />
+
       <Header text="Add new:" />
       <AddNew
         handleChange={handleChange}
         handleSubmit={handleSubmit}
         person={newPerson}
       />
-      <Header text="Entries:" />
 
-      <List array={persons} serached={serachedPerson} />
+      <Header text="Entries:" />
+      <List array={persons} serached={serachedPerson} deletePerson={deletePerson} />
+      {/* <button onClick={deletePerson()} ></button> */}
     </div>
   );
 };
