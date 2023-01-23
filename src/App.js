@@ -37,14 +37,14 @@ const App = () => {
       name: newPerson.name,
       phone: newPerson.phone,
     };
-   const existingUser = persons.find((person) => person.name === personObject.name)
+    const existingUser = persons.find((person) => person.name === personObject.name)
 
     if (existingUser) {
-      if(window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
-        const updatedUser =  { ...existingUser, phone: personObject.phone}
+      if (window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedUser = { ...existingUser, phone: personObject.phone }
         personService
           .updateOne(existingUser.id, updatedUser)
-          .then(returnedPerson => setPersons(returnedPerson))
+          .then(returnedPerson => setPersons(persons.map(person => person.id !== existingUser.id ? person : returnedPerson.data)))
       }
     } else {
       personService
@@ -60,14 +60,14 @@ const App = () => {
   };
 
   const deletePerson = (id) => {
-  const user =  persons.find(person => person.id === id)
-  if(window.confirm(`Delete ${user.name}?`)) {
-    personService
-    .deleteOne(id)
-    .then(data => {
-      setPersons(data)
-    })
-  }
+    const user = persons.find(person => person.id === id)
+    if (window.confirm(`Delete ${user.name}?`)) {
+      personService
+        .deleteOne(id)
+        .then(data => {
+          setPersons(data)
+        })
+    }
   }
   // I gave input names and now they are pulling to the event and are accesible via target.name which we can use to create dynamic name in the object
   // might be a good read on the subject https://www.pluralsight.com/guides/handling-multiple-inputs-with-single-onchange-handler-react

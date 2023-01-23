@@ -17,10 +17,8 @@ const deleteOne = async id => {
    return request.then(res => res.data)
 }
 
-const updateOne = async (id, newPerson) => {
-    await axios.put(`${baseUrl}/${id}`, newPerson)
-    const request = axios.get(baseUrl)
-    return request.then(res => res.data)
+const updateOne = (id, newPerson) => {
+   return axios.put(`${baseUrl}/${id}`, newPerson)
 }
 
 export default { getAll, addOne, deleteOne, updateOne }
