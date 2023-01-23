@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import List from "./components/List";
 import AddNew from "./components/AddNew";
 import personService from "./services/persons";
+import Notification from "./components/Notification";
 
 const App = () => {
 
@@ -26,6 +27,7 @@ const App = () => {
     phone: "",
   });
   const [serachedPerson, setSerachedPerson] = useState("");
+  const [notification, setNotification] = useState(null)
 
   // @EVENT HANDLERS
 
@@ -45,12 +47,25 @@ const App = () => {
         personService
           .updateOne(existingUser.id, updatedUser)
           .then(returnedPerson => setPersons(persons.map(person => person.id !== existingUser.id ? person : returnedPerson.data)))
+          .then(notify => {
+            setNotification(`The  ${personObject.name} entry has been updated`)
+  
+            setTimeout(() => {
+              setNotification(null)
+          }, 5000)
+          })
       }
     } else {
       personService
         .addOne(personObject)
         .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
-      // setPersons(persons.concat(personObject));
+        .then(notify => {
+          setNotification(`The new entry for ${personObject.name} has been added`)
+
+          setTimeout(() => {
+            setNotification(null)
+        }, 5000)
+        })
       // why is this not considered mutating?
       setNewPerson({
         name: "",
@@ -78,9 +93,9 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={notification} />
       <Header text="Phonebook" />
       <Search person={serachedPerson} handleChange={handleSearchChange} />
-
       <Header text="Add new:" />
       <AddNew
         handleChange={handleChange}
