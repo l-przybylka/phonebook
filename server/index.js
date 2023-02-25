@@ -1,51 +1,95 @@
-const contacts = [
+let contacts = [
   {
     "id": 1,
     "name": "Arto Hellas",
-    "number": "040-123456"
+    "phone": "040-123456"
   },
   {
     "id": 2,
     "name": "Ada Lovelace",
-    "number": "39-44-5323523"
+    "phone": "39-44-5323523"
   },
   {
     "id": 3,
     "name": "Dan Abramov",
-    "number": "12-43-234345"
+    "phone": "12-43-234345"
   },
   {
     "id": 4,
     "name": "Mary Poppendieck",
-    "number": "39-23-6423122"
+    "phone": "39-23-6423122"
   }
 ]
 
+
+const { response } = require('express');
 const express = require('express')
 const app = express()
+const cors = require('cors')
+const morgan = require('morgan')
 
-//Use .env file in config folder
+app.use(express.json())
+app.use(cors())
+app.use(morgan('tiny'))
+
 require("dotenv").config({ path: "./config/.env" });
-
 
 app.get('/api/contacts', (req, res) => {
   res.json(contacts)
 })
 
-app.get('/api/contacts/:id', (req,res) => {
-  const id = Number(req.params.id)
+app.get('/api/contacts/:id', (req, res) => {
+  const id = phone(req.params.id)
   const contact = contacts.find(contact => contact.id === id)
-  
-  if(contact) {
+
+  if (contact) {
     res.json(contact)
   } else {
     res.status(404).end()
   }
 })
 
-app.delete('/api/contacts/:id', (res,req) => {
-    const id = Number(req.params.id)
-    contacts = contacts.filter(contact => contact.id !== id)
+app.delete('/api/contacts/:id', (req, res) => {
+  const id = phone(req.params.id)
+  contacts = contacts.filter(contact => contact.id !== id)
+  console.log(contacts)
+  res.status(204).end()
+})
+
+
+app.post('/api/contacts', (req, res) => {
+  const body = req.body
+
+  const notUniqueName = contacts.find(contact => contact.name === body.name)
+
+  if (!body.name) {
+    return res.status(400).json({
+      error: 'Please provide a name'
+    })
+  }
+  if (!body.phone) {
+    return res.status(400).json({
+      error: 'Please provide a phone'
+    })
+  }
+
+  if(notUniqueName) {
+    return res.status(400).json({
+      error: 'Please provide a unique name'
+    })
+  }
+
+  res.json(body)
+
+  const maxId = contacts.length > 0 ? Math.max(...contacts.map(contact => contact.id)) : 0
+  const newContact = [{
+    id: maxId + 1,
+    name: body.name,
+    phone: body.phone
+  }]
+
+  contacts = contacts.concat(newContact)
+  console.log(contacts);
 })
 
 app.get('/info', (req, res) => {

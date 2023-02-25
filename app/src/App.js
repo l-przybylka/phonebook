@@ -46,13 +46,13 @@ const App = () => {
         const updatedUser = { ...existingUser, phone: personObject.phone }
         personService
           .updateOne(existingUser.id, updatedUser)
-                    .then(returnedPerson => setPersons(persons.map(person => person.id !== existingUser.id ? person : returnedPerson.data)))
+          .then(returnedPerson => setPersons(persons.map(person => person.id !== existingUser.id ? person : returnedPerson.data)))
           .then(notify => {
             setNotification(`The  ${personObject.name} entry has been updated`)
-  
+
             setTimeout(() => {
               setNotification(null)
-          }, 5000)
+            }, 5000)
           })
           .catch(e => {
             alert("Entry couldn't be added")
@@ -61,13 +61,13 @@ const App = () => {
     } else {
       personService
         .addOne(personObject)
-             .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
+        .then(returnedPerson => setPersons(persons.concat(returnedPerson)))
         .then(notify => {
           setNotification(`The new entry for ${personObject.name} has been added`)
 
           setTimeout(() => {
             setNotification(null)
-        }, 5000)
+          }, 5000)
         })
         .catch(e => {
           alert("Entry couldn't be added")
